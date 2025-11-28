@@ -1,13 +1,66 @@
-# Placeholder docker-compose.yml
-# Define services for api, redis and postgres when ready.
-# Example skeleton:
-# version: '3.8'
-# services:
-#   api:
-#     build: ./api
-#     ports:
-#       - "5000:80"
-#   redis:
-#     image: redis:7
-#   postgres:
-#     image: postgres:15
+# docker/docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. The .NET Web API Service
+  app:
+    # Use the local Dockerfile to build the image
+    build:
+      context: ../../  # Changed from ../ to ../../ to include the root directory with URLShortener.sln
+      dockerfile: url-shortener/docker/api.Dockerfile  # Updated path to the Dockerfile
+    # Map the container port (e.g., 8080) to the host port (e.g., 5001)
+    ports:
+      - "5001:8080"
+    # Ensure the API service waits for the database and cache to be healthy
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    # Environment variables for connection strings and settings
+    environment:
+      # These must match what your .NET config/code expects
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings:PostgresConnection=Host=db;Port=5432;Database=urlshortener;Username=user;Password=password
+      - ConnectionStrings:RedisConnection=cache:6379,allowAdmin=true 
+    # Optional: If you need to debug or apply changes without full rebuild
+    # volumes:
+    #   - ./src:/app/src 
+
+  # 2. The PostgreSQL Database Service
+  db:
+    image: postgres:16-alpine # Use a lightweight, stable Postgres image
+    restart: always
+    environment:
+      # IMPORTANT: Match these with the API service's connection string
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: urlshortener
+    # Map container port to host port (optional, good for connecting client tools)
+    ports:
+      - "5432:5432"
+    # Persist the data outside the container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck: # Define a health check for 'depends_on' in the 'app' service
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "urlshortener"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. The Redis Cache Service
+  cache:
+    image: redis:7-alpine # Use a lightweight, stable Redis image
+    restart: always
+    # Optional: Map container port to host port
+    ports:
+      - "6379:6379"
+    # Persist the Redis data (optional, only if you need persistence)
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes # Ensure data is saved (optional)
+
+# Define named volumes for data persistence
+volumes:
+  postgres_data:
+  redis_data:
