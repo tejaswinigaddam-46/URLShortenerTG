@@ -1,4 +1,4 @@
-# URL Shortener — Project Layout (placeholder, no code)
+# URL Shortener — Project Layout 
 
 This directory contains a prepared folder structure for a monolithic 3-tier URL shortener using C#, Redis, Postgres, and Docker.
 
