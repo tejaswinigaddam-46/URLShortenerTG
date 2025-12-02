@@ -1,7 +1,8 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace URLShortener.Models
+namespace URLShortener.Infrastructure.Database.Entities
 {
     // Defines the structure of the UrlMapping table in PostgreSQL
     public class UrlMappingDataModel
