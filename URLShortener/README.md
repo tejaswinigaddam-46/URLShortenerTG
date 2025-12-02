@@ -22,7 +22,7 @@ Tech stack
 
 Project structure (placeholders only)
 
-url-shortener/
+URLShortener/
 ├── src/
 │   ├── Api/                # Presentation Layer (API + Razor Pages UI)
 │   │   ├── Controllers/

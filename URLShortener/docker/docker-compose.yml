@@ -7,7 +7,7 @@ services:
     # Use the local Dockerfile to build the image
     build:
       context: ../../  # Changed from ../ to ../../ to include the root directory with URLShortener.sln
-      dockerfile: url-shortener/docker/api.Dockerfile  # Updated path to the Dockerfile
+      dockerfile: URLShortener/docker/api.Dockerfile  # Updated path to the Dockerfile
     # Map the container port (e.g., 8080) to the host port (e.g., 5001)
     ports:
       - "5001:8080"

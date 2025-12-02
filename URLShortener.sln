@@ -2,13 +2,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "url-shortener\src\Api\Api.csproj", "{A1B2C3D4-E5F6-7890-1234-56789ABCDEF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "URLShortener\src\Api\Api.csproj", "{A1B2C3D4-E5F6-7890-1234-56789ABCDEF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "url-shortener\src\Application\Application.csproj", "{B1C2D3E4-F5G6-H890-I234-J6789KLMNOP0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "URLShortener\src\Application\Application.csproj", "{B1C2D3E4-F5G6-H890-I234-J6789KLMNOP0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "url-shortener\src\Infrastructure\Infrastructure.csproj", "{C1D2E3F4-G5H6-I890-J234-K6789LMNOPQ0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "URLShortener\src\Infrastructure\Infrastructure.csproj", "{C1D2E3F4-G5H6-I890-J234-K6789LMNOPQ0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "url-shortener\src\Shared\Shared.csproj", "{D1E2F3G4-H5I6-J890-K234-L6789MNOPQR0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "URLShortener\src\Shared\Shared.csproj", "{D1E2F3G4-H5I6-J890-K234-L6789MNOPQR0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
