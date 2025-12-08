@@ -1,16 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using URLShortener.Infrastructure.Database.DbContext;
+using URLShortener.Application.Interfaces;
+using URLShortener.Application.Services;
+using URLShortener.Infrastructure.Database.Repositories;
+using URLShortener.Infrastructure.Cache.CacheRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();
 
 // --- 1. Data Persistence (PostgreSQL / EF Core) Configuration ---
 
 // Get the PostgreSQL connection string from environment variables/appsettings
-var postgresConnectionString = builder.Configuration.GetConnectionString("PostgresConnection");
+var postgresConnectionString = builder.Configuration.GetConnectionString("PostgresConnection")
+    ?? Environment.GetEnvironmentVariable("ConnectionStrings__PostgresConnection");
 
 if (string.IsNullOrEmpty(postgresConnectionString))
 {
-    throw new InvalidOperationException("PostgresConnection string is not configured. Check your docker-compose.yml or appsettings.");
+    throw new InvalidOperationException("PostgresConnection string is not configured.");
 }
 
 // Add DbContext with Npgsql provider. 
@@ -22,11 +28,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // --- 2. Caching Integration (Redis) Configuration ---
 
 // Get the Redis connection string from environment variables/appsettings
-var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection")
+    ?? Environment.GetEnvironmentVariable("ConnectionStrings__RedisConnection");
 
 if (string.IsNullOrEmpty(redisConnectionString))
 {
-    throw new InvalidOperationException("RedisConnection string is not configured. Check your docker-compose.yml or appsettings.");
+    throw new InvalidOperationException("RedisConnection string is not configured.");
 }
 
 // Add Distributed Cache using StackExchange.Redis provider
@@ -34,11 +41,15 @@ if (string.IsNullOrEmpty(redisConnectionString))
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = redisConnectionString;
-    options.InstanceName = "UrlShortenerInstance:"; // Prefix for all keys
+    options.InstanceName = builder.Configuration["Redis:InstanceName"] ?? Environment.GetEnvironmentVariable("REDIS_INSTANCE_NAME") ?? string.Empty;
 });
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IURLShortenerService, URLShortenerService>();
+builder.Services.AddScoped<IURLShortenerDBRepository, URLShortenerDBRepository>();
+builder.Services.AddScoped<IURLShortenerCacheRepository, URLShortenerCacheRepository>();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
@@ -65,16 +76,17 @@ catch (Exception ex)
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SECRET_SALT")))
 {
-    // Swagger UI temporarily disabled during migrations tooling run. Add Swashbuckle.AspNetCore package to enable it.
+    throw new InvalidOperationException("Secret salt string is not configured.");
 }
 
-app.UseHttpsRedirection();
+// Removed HTTPS redirection to avoid http→https issues in container
 app.UseAuthorization();
 // Hello World endpoint
 app.MapGet("/", () => "Hello World! URL Shortener API is running.");
 
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();

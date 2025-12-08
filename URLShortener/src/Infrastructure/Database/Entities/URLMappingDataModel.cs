@@ -7,14 +7,14 @@ namespace URLShortener.Infrastructure.Database.Entities
     // Defines the structure of the UrlMapping table in PostgreSQL
     public class UrlMappingDataModel
     {
-        // Primary Key for the table. Using GUID for robust identification.
+        // Primary Key for the table. Using long for robust identification.
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public long Id { get; set; }
 
         // The short, unique identifier used in the URL (e.g., "aBc1D").
         [Required]
-        [MaxLength(10)]
+        [MaxLength(7)]
         public string ShortCode { get; set; } = string.Empty;
 
         // The original destination URL.
