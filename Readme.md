@@ -30,15 +30,18 @@ Tech Reasons:
     - Choosing Redis because of the following reasons:
         - Redis is a in-memory database and key-value store supports Fast read operations
 
-3) Unique Short Code Generation:
+3) Unique Short Code Generation: (update base62+Twitter snowflake: easy scalable and reduces db write+update)
     - Short code should be unique
-    - Twitter snowflake can be used to generate unique short codes but we need to pick the first or any 7 digits from encoded 64 bit code (41 bits : timestamp, 10 bits: Worker id, 12: sequence number (rotates))
-        - Always need to do collision check 
+    - (BEST**) Twitter snowflake can be used to generate unique short codes encoded 64 bit code (41 bits : timestamp, 10 bits: Worker id, 12: sequence number (rotates))
         - Avoid security concern of guessing short codes as there is no sequence
-        - Db gets accessed for enitre index read (to avoid collision) and write (to insert new url)
+        - Db gets accessed only for write (to insert new url)
+        - Cons: Not fixed url variable length(7-11 chars)
+        - Snowflake is Timeordered (New Ids always increasing) causes Db(Write contention: always hits right Index of Btree in postgres) similarly for cache recently loaded are more used
     - Choosing Primary Key of Db and multiplying with fixed number and xor using Secret key 
         - No collision check required (as we are considering Primary key ) 
-        - Uisng multiplying with fixed number and xor using Secret key makes it not too easy to guess shortcodes even there is sequence of Primary keys of DB
+        - Multiplying with fixed number and xor using Secret key makes it not too easy to guess shortcodes even there is sequence of Primary keys of DB
+        - Cons:
+        - Unable to scale with sharing(because PKs repeat on shards) or by replication (after replication PK generator should be single bottleneck service)
         - Db will get accessed twice for inserting url
 4) Redirection mechanism:
     - When user hits short url, it should redirect to long url 
