@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,8 +15,8 @@ namespace Infrastructure.Database.Migrations
                 name: "UrlMappings",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ShortCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false, collation: "C"),
+                    SnowflakeId = table.Column<long>(type: "bigint", nullable: false),
+                    ShortCode = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false, collation: "C"),
                     LongUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     Clicks = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -24,7 +24,7 @@ namespace Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UrlMappings", x => x.Id);
+                    table.PrimaryKey("PK_UrlMappings", x => x.SnowflakeId);
                 });
 
             migrationBuilder.CreateIndex(

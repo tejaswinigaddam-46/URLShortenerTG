@@ -24,6 +24,8 @@ services:
       - ASPNETCORE_URLS=${ASPNETCORE_URLS:-http://+:8080}
       - ConnectionStrings:PostgresConnection=Host=${POSTGRES_HOST:-db};Port=${POSTGRES_PORT:-5432};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - ConnectionStrings:RedisConnection=${REDIS_HOST:-cache}:${REDIS_PORT:-6379},allowAdmin=${REDIS_ALLOWADMIN:-true}
+      - MACHINE_ID=${MACHINE_ID}
+      - DATACENTER_ID=${DATACENTER_ID}
     # Optional: If you need to debug or apply changes without full rebuild
     # volumes:
     #   - ./src:/app/src 

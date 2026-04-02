@@ -7,14 +7,14 @@ namespace URLShortener.Infrastructure.Database.Entities
     // Defines the structure of the UrlMapping table in PostgreSQL
     public class UrlMappingDataModel
     {
-        // Primary Key for the table. Using long for robust identification.
+        // Snowflake-generated ID
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long SnowflakeId { get; set; }
 
         // The short, unique identifier used in the URL (e.g., "aBc1D").
         [Required]
-        [MaxLength(7)]
+        [MaxLength(11)]
         public string ShortCode { get; set; } = string.Empty;
 
         // The original destination URL.

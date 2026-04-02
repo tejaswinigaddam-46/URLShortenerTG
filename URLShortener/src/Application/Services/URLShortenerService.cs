@@ -1,6 +1,7 @@
 using URLShortener.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using URLShortener.Application.Exceptions;
+using URLShortener.Application.Utilities;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,14 @@ namespace URLShortener.Application.Services{
         private readonly IURLShortenerCacheRepository _cacheRepository;
         private readonly IURLShortenerDBRepository _dbRepository;
          private readonly ILogger<URLShortenerService> _logger;
-        private const string Green = "\x1B[32m";
-        private const string Reset = "\x1B[0m";
-
-        public URLShortenerService(IURLShortenerCacheRepository cacheRepository, IURLShortenerDBRepository dbRepository, ILogger<URLShortenerService> logger)
+        private readonly SnowflakeIdGenerator _snowflakeIdGenerator;
+        
+        public URLShortenerService(IURLShortenerCacheRepository cacheRepository, IURLShortenerDBRepository dbRepository, ILogger<URLShortenerService> logger, SnowflakeIdGenerator snowflakeIdGenerator)
         {
             _cacheRepository = cacheRepository;
             _dbRepository = dbRepository;
             _logger = logger;
+            _snowflakeIdGenerator = snowflakeIdGenerator;
         }
 
         public async Task<string?> GenerateShortCodeAsync(string longUrl)
@@ -39,22 +40,14 @@ namespace URLShortener.Application.Services{
             {
             }
 
-            // Step 1 → Insert URL, get sequential ID
-            long id = await _dbRepository.InsertLongUrlAsync(longUrl);
+            // Step 1 → Generate Snowflake ID
+            long snowflakeId = _snowflakeIdGenerator.NextId();
 
-            // Step 2 → XOR obfuscation
-            var secretSaltStr = Environment.GetEnvironmentVariable("SECRET_SALT");
-            if (!long.TryParse(secretSaltStr, out var secretSalt))
-            {
-                throw new InvalidOperationException("SECRET_SALT is not configured or invalid.");
-            }
-            // _logger.LogInformation($"{Green}ID from DB: {id}{Reset}");
-            long obfuscated = (id*9853) ^ secretSalt;
-            // _logger.LogInformation($"{Green}Obfuscated ID: {obfuscated}{Reset}");
-            string code = Base62EncodeFixed(obfuscated, 7);
-           //  _logger.LogInformation($"{Green}Generated short code after obfuscation: {code} for ID: {id}{Reset}");
-            // Step 4 → Update DB with the final shortcode
-            await _dbRepository.UpdateShortCodeAsync(id, code);
+            // Step 2 → Base62Encode the Snowflake ID
+            string code = Base62Encoder.Encode(snowflakeId);
+
+            // Step 3 → Insert into DB using new DB method
+            await _dbRepository.InsertUrlMappingAsync(snowflakeId, code, longUrl);
 
             return code;
         }
@@ -114,24 +107,6 @@ namespace URLShortener.Application.Services{
             return _dbRepository.IncrementClickCountAsync(shortCode);
         }
 
-        private string Base62EncodeFixed(long value, int length)
-        {
-            const string base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            var result = new char[length];
-            var modulus = 1L;
-            for (int i = 0; i < length; i++) modulus *= 62L;
-            var v = ((value % modulus) + modulus) % modulus;
-            // _logger.LogInformation($"{Green}Initial value before obfuscation: {v} {Reset}");
-            
-            for (int i = length - 1; i >= 0; i--)
-            {
-                var rem = (int)(v % 62L);
-                result[i] = base62Chars[rem];
-                v /= 62L;
-            }
-           // _logger.LogInformation($"{Green}Remaining value after obfuscation: {v} {Reset}");
-            
-            return new string(result);
-        }
+        
     }
 }

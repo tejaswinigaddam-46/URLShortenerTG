@@ -13,25 +13,18 @@ namespace URLShortener.Infrastructure.Database.Repositories {
             _dbContext = dbContext;
         }
 
-        public async Task<long> InsertLongUrlAsync(string longUrl){
-
+        public async Task InsertUrlMappingAsync(long snowflakeId, string shortCode, string longUrl)
+        {
             var urlMapping = new UrlMappingDataModel
             {
+                SnowflakeId = snowflakeId,
+                ShortCode = shortCode,
                 LongUrl = longUrl,
-                Clicks = 0
+                Clicks = 0,
+                CreatedDate = DateTime.UtcNow,
+                ExpirationDate = DateTime.UtcNow.AddYears(3)
             };
             _dbContext.UrlMappings.Add(urlMapping);
-            await _dbContext.SaveChangesAsync();
-            return urlMapping.Id;
-        }
-
-        public async Task UpdateShortCodeAsync(long id, string shortCode){
-            var urlMapping = await _dbContext.UrlMappings.FirstOrDefaultAsync(um => um.Id == id);
-            if (urlMapping == null)
-            {
-                throw new LongURLNotFoundException("Inserted URL record not found.");
-            }
-            urlMapping.ShortCode = shortCode;
             await _dbContext.SaveChangesAsync();
         }
 

@@ -57,12 +57,12 @@ namespace URLShortener.Api.Pages
                 error = "Enter a short code";
                 return false;
             }
-            if (shortCode.Length > 7)
+            if (shortCode.Length > 11)
             {
                 error = "Short code too long";
                 return false;
             }
-            if (!Regex.IsMatch(shortCode, "^[0-9A-Za-z]{1,7}$"))
+            if (!Regex.IsMatch(shortCode, "^[0-9A-Za-z]{1,11}$"))
             {
                 error = "Invalid short code";
                 return false;

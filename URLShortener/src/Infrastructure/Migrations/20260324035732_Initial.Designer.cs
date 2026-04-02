@@ -9,11 +9,11 @@ using URLShortener.Infrastructure.Database.DbContext;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251202123948_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260324035732_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,8 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("URLShortener.Infrastructure.Database.Entities.UrlMappingDataModel", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<long>("SnowflakeId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Clicks")
                         .HasColumnType("integer");
@@ -47,11 +46,11 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<string>("ShortCode")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
                         .UseCollation("C");
 
-                    b.HasKey("Id");
+                    b.HasKey("SnowflakeId");
 
                     b.HasIndex("ShortCode")
                         .IsUnique();

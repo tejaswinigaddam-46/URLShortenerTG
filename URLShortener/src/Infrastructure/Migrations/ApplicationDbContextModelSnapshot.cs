@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using URLShortener.Infrastructure.Database.DbContext;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251207075032_AlignModel")]
-    partial class AlignModel
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,11 +24,8 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("URLShortener.Infrastructure.Database.Entities.UrlMappingDataModel", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<long>("SnowflakeId")
                         .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<int>("Clicks")
                         .HasColumnType("integer");
@@ -49,11 +43,11 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<string>("ShortCode")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
                         .UseCollation("C");
 
-                    b.HasKey("Id");
+                    b.HasKey("SnowflakeId");
 
                     b.HasIndex("ShortCode")
                         .IsUnique();

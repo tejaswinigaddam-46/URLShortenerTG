@@ -126,13 +126,13 @@ namespace URLShortener.Api.Controllers
                 return false;
             }
 
-            if (shortCode.Length > 7)
+            if (shortCode.Length > 11)
             {
-                error = "shortCode must be at most 7 characters";
+                error = "shortCode must be at most 11 characters";
                 return false;
             }
 
-            if (!Regex.IsMatch(shortCode, "^[0-9A-Za-z]{1,7}$"))
+            if (!Regex.IsMatch(shortCode, "^[0-9A-Za-z]{1,11}$"))
             {
                 error = "shortCode must be base62 alphanumeric";
                 return false;

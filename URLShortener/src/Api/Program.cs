@@ -48,6 +48,11 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IURLShortenerService, URLShortenerService>();
+// Read machineId and datacenterId from environment variables
+var machineId = long.Parse(Environment.GetEnvironmentVariable("MACHINE_ID"));
+var datacenterId = long.Parse(Environment.GetEnvironmentVariable("DATACENTER_ID"));
+
+builder.Services.AddSingleton(new URLShortener.Application.Utilities.SnowflakeIdGenerator(machineId, datacenterId));
 builder.Services.AddScoped<IURLShortenerDBRepository, URLShortenerDBRepository>();
 builder.Services.AddScoped<IURLShortenerCacheRepository, URLShortenerCacheRepository>();
 builder.Services.AddEndpointsApiExplorer();
@@ -76,10 +81,6 @@ catch (Exception ex)
 
 
 // Configure the HTTP request pipeline.
-if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SECRET_SALT")))
-{
-    throw new InvalidOperationException("Secret salt string is not configured.");
-}
 
 // Removed HTTPS redirection to avoid http→https issues in container
 app.UseAuthorization();
